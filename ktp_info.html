@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirm KTP Information</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <div class="max-w-md mx-auto min-h-screen flex flex-col p-6">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-2xl font-bold text-gray-800">Confirm Your Data</h1>
+            <p class="text-gray-500 mt-2">Please ensure the following information extracted from your ID is correct.</p>
+        </div>
+
+        <!-- Data Display Section -->
+        <div class="bg-white p-6 rounded-lg shadow-md flex-grow">
+            <div class="space-y-4">
+                <!-- Data Item: NIK -->
+                <div>
+                    <p class="text-sm text-gray-500">NIK</p>
+                    <p class="text-lg font-semibold text-gray-900">2353465712345688</p>
+                </div>
+                <hr>
+                <!-- Data Item: Nama -->
+                <div>
+                    <p class="text-sm text-gray-500">Nama</p>
+                    <p class="text-lg font-semibold text-gray-900">LINA SAPUTRI</p>
+                </div>
+                <hr>
+                <!-- Data Item: Tempat/Tgl Lahir -->
+                <div>
+                    <p class="text-sm text-gray-500">Tempat/Tgl Lahir</p>
+                    <p class="text-lg font-semibold text-gray-900">SURAKARTA 21-04-1982</p>
+                </div>
+                <hr>
+                <!-- Data Item: Alamat -->
+                <div>
+                    <p class="text-sm text-gray-500">Alamat</p>
+                    <p class="text-lg font-semibold text-gray-900">KEBON KOSONG, KEMAYORAN</p>
+                </div>
+                 <hr>
+                <!-- Data Item: Agama -->
+                <div>
+                    <p class="text-sm text-gray-500">Agama</p>
+                    <p class="text-lg font-semibold text-gray-900">ISLAM</p>
+                </div>
+                 <hr>
+                 <!-- Data Item: Pekerjaan -->
+                <div>
+                    <p class="text-sm text-gray-500">Pekerjaan</p>
+                    <p class="text-lg font-semibold text-gray-900">IBU RUMAH TANGGA</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="mt-8 space-y-3">
+            <a href="bank_page.html" class="block w-full text-center bg-blue-600 text-white font-bold py-4 rounded-lg hover:bg-blue-700">
+                Data is correct
+            </a>
+            <a href="index.html" class="block w-full text-center bg-gray-200 text-gray-700 font-bold py-4 rounded-lg hover:bg-gray-300">
+                Data is incorrect
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>

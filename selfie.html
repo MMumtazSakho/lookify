@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Take Selfie with ID</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .full-screen-layout { height: 100vh; height: -webkit-fill-available; }
+        video::-webkit-media-controls { display: none !important; }
+        @keyframes move-right { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(20px); } }
+        @keyframes move-left { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(-20px); } }
+        @keyframes move-up { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        .animate-move-right { animation: move-right 1.5s ease-in-out infinite; }
+        .animate-move-left { animation: move-left 1.5s ease-in-out infinite; }
+        .animate-move-up { animation: move-up 1.5s ease-in-out infinite; }
+    </style>
+</head>
+<body class="bg-white text-gray-800">
+
+    <div class="flex flex-col justify-between p-6 full-screen-layout max-w-md mx-auto">
+        <div id="top-note">
+            <p><span class="font-bold">Note:</span> Hold your ID under your face. Make sure both your face and the ID are clearly visible.</p>
+        </div>
+
+        <div id="camera-view" class="relative w-full aspect-[3/4] bg-gray-900 rounded-lg overflow-hidden my-4">
+            <video id="video-feed" autoplay playsinline class="w-full h-full object-cover"></video>
+            <img id="photo-preview" class="hidden w-full h-full object-cover" alt="Captured selfie">
+            <div id="guide-overlay">
+                <div class="absolute inset-0 flex items-center justify-center p-8 pointer-events-none">
+                    <div class="relative w-full h-2/3">
+                        <div class="absolute top-0 left-0 w-12 h-12 border-t-[6px] border-l-[6px] border-white rounded-tl-lg"></div>
+                        <div class="absolute top-0 right-0 w-12 h-12 border-t-[6px] border-r-[6px] border-white rounded-tr-lg"></div>
+                        <div class="absolute bottom-0 left-0 w-12 h-12 border-b-[6px] border-l-[6px] border-white rounded-bl-lg"></div>
+                        <div class="absolute bottom-0 right-0 w-12 h-12 border-b-[6px] border-r-[6px] border-white rounded-br-lg"></div>
+                    </div>
+                </div>
+                <div class="absolute inset-0 flex items-end justify-center pb-16 pointer-events-none">
+                     <div class="relative w-1/2 h-1/4">
+                        <div class="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-white rounded-tl-md"></div>
+                        <div class="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-white rounded-tr-md"></div>
+                        <div class="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-white rounded-bl-md"></div>
+                        <div class="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-white rounded-br-md"></div>
+                    </div>
+                </div>
+            </div>
+            <div id="liveness-overlay" class="hidden absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center text-white p-4">
+                <p id="timer-display" class="text-2xl font-bold">Time left: 20s</p>
+                <div id="liveness-visual-guide" class="w-48 h-64 border-4 border-dashed border-white rounded-[50%] my-4 flex items-center justify-center">
+                    <div id="liveness-arrow-container"></div>
+                </div>
+                <p id="instruction-text" class="text-2xl font-semibold text-center"></p>
+                <p id="progress-display" class="text-lg mt-2"></p>
+            </div>
+            <div id="result-overlay" class="hidden absolute inset-0 bg-white flex flex-col items-center justify-center p-4">
+                <p id="result-text" class="text-3xl font-bold"></p>
+                <button id="try-again-button" class="mt-6 font-bold text-white bg-blue-600 py-3 px-8 rounded-full">Try Again</button>
+            </div>
+        </div>
+
+        <div class="h-20 flex justify-center items-center">
+            <button id="shutter-button" class="w-20 h-20 bg-black rounded-full shadow-lg cursor-pointer"></button>
+            <div id="confirm-buttons" class="hidden w-full flex justify-around items-center">
+                <button id="retake-button" class="font-semibold text-gray-600 py-2 px-6 rounded-full hover:bg-gray-200">Retake</button>
+                <button id="confirm-button" class="font-bold text-white bg-blue-600 py-3 px-8 rounded-full hover:bg-blue-700">Confirm</button>
+            </div>
+        </div>
+    </div>
+    <canvas id="canvas" class="hidden"></canvas>
+
+    <script>
+        const elements = {
+            video: document.getElementById('video-feed'),
+            photoPreview: document.getElementById('photo-preview'),
+            canvas: document.getElementById('canvas'),
+            shutterButton: document.getElementById('shutter-button'),
+            confirmButtons: document.getElementById('confirm-buttons'),
+            retakeButton: document.getElementById('retake-button'),
+            confirmButton: document.getElementById('confirm-button'),
+            guideOverlay: document.getElementById('guide-overlay'),
+            livenessOverlay: document.getElementById('liveness-overlay'),
+            timerDisplay: document.getElementById('timer-display'),
+            instructionText: document.getElementById('instruction-text'),
+            progressDisplay: document.getElementById('progress-display'),
+            livenessArrow: document.getElementById('liveness-arrow-container'),
+            resultOverlay: document.getElementById('result-overlay'),
+            resultText: document.getElementById('result-text'),
+            tryAgainButton: document.getElementById('try-again-button'),
+            topNote: document.getElementById('top-note')
+        };
+        
+        let stream, livenessTimer, instructionTimer;
+
+        const livenessInstructions = {
+            TILT_RIGHT: { text: "Tilt your head right", visual: `<svg class="w-16 h-16 animate-move-right" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>` },
+            TILT_LEFT: { text: "Tilt your head left", visual: `<svg class="w-16 h-16 animate-move-left" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>` },
+            LOOK_UP: { text: "Look up", visual: `<svg class="w-16 h-16 animate-move-up" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>` },
+            SMILE: { text: "Smile for the camera", visual: `<svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>` }
+        };
+
+        async function startCamera() {
+            try {
+                if (stream) { stream.getTracks().forEach(track => track.stop()); }
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+                elements.video.srcObject = stream;
+            } catch (err) { alert("Could not access the camera."); }
+        }
+
+        function takePhoto() {
+            elements.canvas.width = elements.video.videoWidth;
+            elements.canvas.height = elements.video.videoHeight;
+            elements.canvas.getContext('2d').drawImage(elements.video, 0, 0, elements.canvas.width, elements.canvas.height);
+            elements.photoPreview.src = elements.canvas.toDataURL('image/png');
+            if (stream) stream.getTracks().forEach(track => track.stop());
+            setUIState('preview');
+        }
+
+        function startLivenessCheck() {
+            setUIState('liveness');
+            startCamera();
+            const instructionKeys = Object.keys(livenessInstructions);
+            const selectedKeys = [...instructionKeys].sort(() => 0.5 - Math.random()).slice(0, 3);
+            let currentIndex = 0;
+            let timeLeft = 20;
+            livenessTimer = setInterval(() => {
+                timeLeft--;
+                elements.timerDisplay.textContent = `Time left: ${timeLeft}s`;
+                if (timeLeft <= 0) handleLivenessResult(false);
+            }, 1000);
+            function nextInstruction() {
+                if (currentIndex >= selectedKeys.length) {
+                    handleLivenessResult(true);
+                    return;
+                }
+                const key = selectedKeys[currentIndex];
+                const instruction = livenessInstructions[key];
+                elements.instructionText.textContent = instruction.text;
+                elements.livenessArrow.innerHTML = instruction.visual;
+                elements.progressDisplay.textContent = `${currentIndex + 1} of ${selectedKeys.length}`;
+                currentIndex++;
+                instructionTimer = setTimeout(nextInstruction, 4000);
+            }
+            nextInstruction();
+        }
+
+        function handleLivenessResult(isSuccess) {
+            clearInterval(livenessTimer);
+            clearTimeout(instructionTimer);
+            setUIState('result', isSuccess);
+            
+            if (isSuccess) {
+                setTimeout(() => {
+                    window.location.href = 'ktp_info.html';
+                }, 2000);
+            }
+        }
+        
+        function setUIState(state, isSuccess) {
+            const allElements = [elements.guideOverlay, elements.livenessOverlay, elements.resultOverlay, elements.shutterButton, elements.confirmButtons, elements.video, elements.photoPreview, elements.topNote];
+            allElements.forEach(el => el.classList.add('hidden'));
+            if (state === 'capture') {
+                elements.topNote.classList.remove('hidden');
+                elements.video.classList.remove('hidden');
+                elements.guideOverlay.classList.remove('hidden');
+                elements.shutterButton.classList.remove('hidden');
+            } else if (state === 'preview') {
+                elements.topNote.classList.remove('hidden');
+                elements.photoPreview.classList.remove('hidden');
+                elements.guideOverlay.classList.remove('hidden');
+                elements.confirmButtons.classList.remove('hidden');
+            } else if (state === 'liveness') {
+                elements.video.classList.remove('hidden');
+                elements.livenessOverlay.classList.remove('hidden');
+            } else if (state === 'result') {
+                elements.resultOverlay.classList.remove('hidden');
+                elements.resultText.textContent = isSuccess ? "✅ Verification Successful!" : "❌ Verification Failed";
+                elements.resultText.className = `text-3xl font-bold ${isSuccess ? 'text-green-600' : 'text-red-600'}`;
+                elements.tryAgainButton.classList.toggle('hidden', isSuccess);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            setUIState('capture');
+            startCamera();
+        });
+        elements.shutterButton.addEventListener('click', takePhoto);
+        elements.retakeButton.addEventListener('click', () => {
+            setUIState('capture');
+            startCamera();
+        });
+        elements.confirmButton.addEventListener('click', startLivenessCheck);
+        elements.tryAgainButton.addEventListener('click', () => {
+            setUIState('capture');
+            startCamera();
+        });
+    </script>
+</body>
+</html>

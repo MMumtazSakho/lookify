@@ -1,78 +1,168 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Identity Verification</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        /* Custom styles to apply the Inter font */
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        /* Custom background color to match the image */
-        .bg-custom-blue {
-            background-color: #4A6C88;
-        }
-        /* Custom button color */
-        .bg-custom-dark-blue {
-            background-color: #3B5971;
-        }
-        .bg-custom-dark-blue:hover {
-            background-color: #314a5e;
-        }
-        /* Custom list background color */
-        .bg-custom-list-blue {
-             background-color: #3B5971;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lookify - AI Identity & Payment APIs</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      color: white;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.2rem 3rem;
+      background-color: rgba(0, 0, 0, 0.2);
+      position: sticky;
+      top: 0;
+      backdrop-filter: blur(8px);
+      z-index: 10;
+    }
+
+    nav h1 {
+      font-size: 2rem;
+      background: linear-gradient(to right, #f9d423, #ff4e50);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    nav a {
+      margin-left: 1.5rem;
+      color: #ffffff;
+      text-decoration: none;
+      font-weight: bold;
+      transition: color 0.3s ease;
+    }
+
+    nav a:hover {
+      color: #f9d423;
+    }
+
+    header {
+      text-align: center;
+      padding: 5rem 2rem 3rem;
+    }
+
+    header h2 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    header p {
+      font-size: 1.2rem;
+      color: #cccccc;
+    }
+
+    .services {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 3rem;
+      gap: 2rem;
+    }
+
+    .card {
+      background-color: #1c1c2e;
+      padding: 2rem;
+      border-radius: 1.5rem;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+      max-width: 300px;
+      text-align: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+    }
+
+    .card h3 {
+      color: #f9d423;
+      margin-bottom: 1rem;
+    }
+
+    .card p {
+      font-size: 0.95rem;
+      color: #cccccc;
+      margin-bottom: 1.5rem;
+    }
+
+    .card a {
+      text-decoration: none;
+      background: #f9d423;
+      padding: 0.6rem 1.2rem;
+      border-radius: 30px;
+      font-weight: bold;
+      color: black;
+      transition: background 0.3s;
+    }
+
+    .card a:hover {
+      background: #ff4e50;
+      color: white;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.9rem;
+      background-color: #0f0c29;
+      color: #999;
+    }
+  </style>
 </head>
-<body class="bg-custom-blue text-white min-h-screen flex items-center justify-center p-4">
 
-    <div class="w-full max-w-sm mx-auto flex flex-col items-center text-center">
-
-        <div class="mb-6 flex flex-col items-center">
-            <img src="assets/images/logo.png" alt="Lookify Logo">
-            <!-- <h1 class="text-2xl font-bold mt-2">Lookify</h1> -->
-        </div>
-
-        <div class="mb-8">
-            <h2 class="text-3xl font-semibold leading-tight">Lets Verify your Identity</h2>
-            <p class="mt-4 text-gray-200 text-base max-w-xs">
-                To protect your account and comply with regulations, we need to verify your identity.
-            </p>
-        </div>
-
-        <div class="flex justify-center items-center space-x-4 mb-8">
-            <img src="assets/images/ktp.png" 
-                 alt="ID Card Illustration" 
-                 class="rounded-lg shadow-lg w-[120px] h-[80px]"
-                 onerror="this.onerror=null;this.src='https://placehold.co/120x80/6E8DA4/FFFFFF?text=ID+Card';">
-            <img src="assets/images/person.png" 
-                 alt="Face Photo Illustration" 
-                 class="rounded-lg shadow-lg w-[80px] h-[100px]"
-                 onerror="this.onerror=null;this.src='https://placehold.co/80x100/E0E0E0/333333?text=Person';">
-        </div>
-
-        <div class="bg-custom-list-blue p-6 rounded-lg w-full max-w-xs mb-10 text-left">
-            <ol class="list-decimal list-inside space-y-3 text-gray-100">
-                <li>Face photo</li>
-                <li>ID photo</li>
-                <li>Selfie with ID</li>
-                <li>Video gesture verification</li>
-            </ol>
-        </div>
-
-        <div class="w-full max-w-xs">
-            <a href="selfie.html" class="block bg-custom-dark-blue text-white font-bold py-4 px-4 rounded-full w-full shadow-lg transition-transform transform hover:scale-105 text-center">
-                Continue
-            </a>
-        </div>
-
+<body>
+  <nav>
+    <h1>Lookify</h1>
+    <div>
+      <a href="#services">Services</a>
+      <a href="documentation.html">API Docs</a>
+      <a href="#contact">Contact</a>
     </div>
+  </nav>
 
+  <header>
+    <h2>Empower Identity & Payment with AI</h2>
+    <p>Lookify provides modern APIs for AI-based KYC, face authentication, and frictionless payment</p>
+  </header>
+
+  <section id="services" class="services">
+    <div class="card">
+      <h3>KYC</h3>
+      <p>AI-powered biometric KYC for instant user verification and registration.</p>
+      <a href="kyc.html">Explore KYC</a>
+    </div>
+    <div class="card">
+      <h3>Face as PIN</h3>
+      <p>Secure your users with facial authentication that replaces traditional PINs.</p>
+      <a href="facepin.html">Explore Face as PIN</a>
+    </div>
+    <div class="card">
+      <h3>Smile and Pay</h3>
+      <p>Let your customers pay with just a face. No customer device needed</p>
+      <a href="smilepay.html">Explore Smile & Pay</a>
+    </div>
+  </section>
+
+  <footer id="contact">
+    <p>&copy; 2025 Lookify Technologies. Built with ❤️ and face recognition.</p>
+    <p>Contact us at <a href="mailto:info@lookify.ai" style="color: #f9d423;">info@lookify.ai</a></p>
+  </footer>
 </body>
+
 </html>

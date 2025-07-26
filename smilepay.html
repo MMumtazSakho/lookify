@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lookify Smile & Pay</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    video::-webkit-media-controls { display: none !important; }
+    @keyframes move-right { 0%,100%{transform:translateX(0);}50%{transform:translateX(20px);} }
+    @keyframes move-left { 0%,100%{transform:translateX(0);}50%{transform:translateX(-20px);} }
+    @keyframes move-up { 0%,100%{transform:translateY(0);}50%{transform:translateY(-20px);} }
+    .animate-move-right { animation: move-right 1.5s ease-in-out infinite; }
+    .animate-move-left { animation: move-left 1.5s ease-in-out infinite; }
+    .animate-move-up { animation: move-up 1.5s ease-in-out infinite; }
+  </style>
+</head>
+<body class="bg-white text-gray-900 flex items-center justify-center h-screen">
+  <div class="w-full max-w-md p-6">
+    <!-- Step 1 -->
+    <div id="step1" class="step active">
+      <h2 class="text-xl font-semibold mb-4">Enter Your Name</h2>
+      <input type="text" id="inputName" placeholder="e.g. John Doe" class="w-full p-3 border border-gray-300 rounded-md mb-4" />
+      <button onclick="nextStep(2)" class="w-full py-3 bg-blue-600 text-white rounded-md">Next</button>
+    </div>
+    <!-- Step 2 -->
+    <div id="step2" class="step hidden">
+      <h2 class="text-xl font-semibold mb-4">Select Bank</h2>
+      <ul id="bankList" class="mb-4">
+        <li onclick="selectBank(this)" class="p-3 mb-2 bg-gray-100 rounded-md cursor-pointer">Bank A</li>
+        <li onclick="selectBank(this)" class="p-3 mb-2 bg-gray-100 rounded-md cursor-pointer">Bank B</li>
+        <li onclick="selectBank(this)" class="p-3 mb-2 bg-gray-100 rounded-md cursor-pointer">Bank C</li>
+        <li onclick="selectBank(this)" class="p-3 mb-2 bg-gray-100 rounded-md cursor-pointer">Bank D</li>
+      </ul>
+      <button onclick="nextStep(3)" class="w-full py-3 bg-blue-600 text-white rounded-md">Next</button>
+    </div>
+    <!-- Step 3: Liveness -->
+    <div id="step3" class="step hidden">
+      <img src="assets/images/logo.png" alt="Lookify Logo" class="w-16 mx-auto mb-4">
+      <div class="relative w-full aspect-[3/4] bg-gray-900 rounded-lg overflow-hidden">
+        <video id="video" autoplay playsinline class="w-full h-full object-cover"></video>
+        <!-- corner guides -->
+        <div class="absolute inset-0 flex items-center justify-center p-8 pointer-events-none">
+          <div class="relative w-full h-2/3">
+            <div class="absolute top-0 left-0 w-12 h-12 border-t-4 border-l-4 border-white rounded-tl-lg"></div>
+            <div class="absolute top-0 right-0 w-12 h-12 border-t-4 border-r-4 border-white rounded-tr-lg"></div>
+            <div class="absolute bottom-0 left-0 w-12 h-12 border-b-4 border-l-4 border-white rounded-bl-lg"></div>
+            <div class="absolute bottom-0 right-0 w-12 h-12 border-b-4 border-r-4 border-white rounded-br-lg"></div>
+          </div>
+        </div>
+        <!-- overlay -->
+        <div id="liveness-overlay" class="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center text-white p-4">
+          <p id="timer-display" class="text-2xl font-bold mb-4">Time left: 8s</p>
+          <div id="liveness-visual-guide" class="w-48 h-64 border-4 border-dashed border-white rounded-full mb-4 flex items-center justify-center">
+            <div id="liveness-arrow-container"></div>
+          </div>
+          <p id="instruction-text" class="text-xl font-semibold text-center">Instruction</p>
+        </div>
+      </div>
+    </div>
+    <!-- Step 4 -->
+    <div id="step4" class="step hidden">
+      <h2 class="text-xl font-semibold mb-4">Enter Amount</h2>
+      <div id="amountDisplay" class="text-2xl font-mono mb-4">0</div>
+      <div class="grid grid-cols-3 gap-2 mb-4">
+        <button onclick="addDigit('1')" class="p-3 bg-gray-100 rounded">1</button>
+        <button onclick="addDigit('2')" class="p-3 bg-gray-100 rounded">2</button>
+        <button onclick="addDigit('3')" class="p-3 bg-gray-100 rounded">3</button>
+        <button onclick="addDigit('4')" class="p-3 bg-gray-100 rounded">4</button>
+        <button onclick="addDigit('5')" class="p-3 bg-gray-100 rounded">5</button>
+        <button onclick="addDigit('6')" class="p-3 bg-gray-100 rounded">6</button>
+        <button onclick="addDigit('7')" class="p-3 bg-gray-100 rounded">7</button>
+        <button onclick="addDigit('8')" class="p-3 bg-gray-100 rounded">8</button>
+        <button onclick="addDigit('9')" class="p-3 bg-gray-100 rounded">9</button>
+        <button onclick="addDigit('0')" class="p-3 bg-gray-100 rounded">0</button>
+        <button onclick="backspace('amountDisplay')" class="p-3 bg-gray-100 rounded">←</button>
+      </div>
+      <button onclick="nextStep(5)" class="w-full py-3 bg-blue-600 text-white rounded-md">Next</button>
+    </div>
+    <!-- Step 5 -->
+    <div id="step5" class="step hidden">
+      <h2 class="text-xl font-semibold mb-4">Enter PIN</h2>
+      <div id="pinDisplay" class="text-2xl font-mono mb-4">----</div>
+      <div class="grid grid-cols-3 gap-2 mb-4">
+        <button onclick="addDigit('1','pinDisplay',true)" class="p-3 bg-gray-100 rounded">1</button>
+        <button onclick="addDigit('2','pinDisplay',true)" class="p-3 bg-gray-100 rounded">2</button>
+        <button onclick="addDigit('3','pinDisplay',true)" class="p-3 bg-gray-100 rounded">3</button>
+        <button onclick="addDigit('4','pinDisplay',true)" class="p-3 bg-gray-100 rounded">4</button>
+        <button onclick="addDigit('5','pinDisplay',true)" class="p-3 bg-gray-100 rounded">5</button>
+        <button onclick="addDigit('6','pinDisplay',true)" class="p-3 bg-gray-100 rounded">6</button>
+        <button onclick="addDigit('7','pinDisplay',true)" class="p-3 bg-gray-100 rounded">7</button>
+        <button onclick="addDigit('8','pinDisplay',true)" class="p-3 bg-gray-100 rounded">8</button>
+        <button onclick="addDigit('9','pinDisplay',true)" class="p-3 bg-gray-100 rounded">9</button>
+        <button onclick="addDigit('0','pinDisplay',true)" class="p-3 bg-gray-100 rounded">0</button>
+        <button onclick="backspace('pinDisplay',true)" class="p-3 bg-gray-100 rounded">←</button>
+      </div>
+      <button onclick="finish()" class="w-full py-3 bg-blue-600 text-white rounded-md">Confirm</button>
+    </div>
+  </div>
+
+  <script>
+    const instructions = {
+      TILT_RIGHT: { text: "Tilt your head right", visual: `<svg class="w-16 h-16 animate-move-right" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>` },
+      TILT_LEFT: { text: "Tilt your head left", visual: `<svg class="w-16 h-16 animate-move-left" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>` },
+      LOOK_UP: { text: "Look up", visual: `<svg class="w-16 h-16 animate-move-up" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>` },
+      SMILE: { text: "Smile for the camera", visual: `<svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>` }
+    };
+    let selectedBank = null; let amount = ''; let pin = ''; let stream;
+
+    function nextStep(step) {
+      if (step===2 && !document.getElementById('inputName').value.trim()){alert('Enter name');return;}
+      if (step===3 && !selectedBank){alert('Select bank');return;}
+      document.querySelectorAll('.step').forEach(el=>el.classList.add('hidden'));
+      document.getElementById('step'+step).classList.remove('hidden');
+      if(step===3){startCamera();startLiveness();}
+    }
+    function selectBank(el){document.querySelectorAll('#bankList li').forEach(li=>li.classList.remove('bg-blue-100','text-blue-800'));el.classList.add('bg-blue-100','text-blue-800');selectedBank=el.innerText;}
+    async function startCamera(){if(stream)stream.getTracks().forEach(t=>t.stop());stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'}});document.getElementById('video').srcObject=stream;}
+    function startLiveness(){const keys=Object.keys(instructions);const key=keys[Math.floor(Math.random()*keys.length)];const ins=instructions[key];document.getElementById('instruction-text').innerText=ins.text;document.getElementById('liveness-arrow-container').innerHTML=ins.visual;let t=8;document.getElementById('timer-display').innerText=`Time left: ${t}s`;const iv=setInterval(()=>{t--;document.getElementById('timer-display').innerText=`Time left: ${t}s`;if(t<=0){clearInterval(iv);stream.getTracks().forEach(tr=>tr.stop());nextStep(4);} },1000);}  
+    function addDigit(d,disp='amountDisplay',h=false){if(h){if(pin.length<4)pin+=d;document.getElementById(disp).innerText='*'.repeat(pin.length)+'-'.repeat(4-pin.length);}else{amount+=d;document.getElementById(disp).innerText=amount?new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR'}).format(amount):'0';}}    
+    function backspace(disp,h=false){if(h){pin=pin.slice(0,-1);document.getElementById(disp).innerText='*'.repeat(pin.length)+'-'.repeat(4-pin.length);}else{amount=amount.slice(0,-1);document.getElementById(disp).innerText=amount?new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR'}).format(amount):'0';}}
+    function finish(){if(pin.length<4){alert('Enter 4-digit PIN');return;}alert(`Payment of ${new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR'}).format(amount)} via ${selectedBank} successful!`);location.reload();}
+  </script>
+</body>
+</html>

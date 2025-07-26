@@ -21,11 +21,13 @@
 <body class="bg-white text-gray-800">
 
     <div class="flex flex-col justify-between p-6 full-screen-layout max-w-md mx-auto">
+        <img src="assets/images/logo.png" alt="Lookify Logo">
         <div id="top-note">
             <p><span class="font-bold">Note:</span> Hold your ID under your face. Make sure both your face and the ID are clearly visible.</p>
         </div>
 
         <div id="camera-view" class="relative w-full aspect-[3/4] bg-gray-900 rounded-lg overflow-hidden my-4">
+            <!-- <img src="assets/images/logo.png" alt="Lookify Logo" class="absolute top-4 left-1/2 -translate-x-1/2 w-12 h-12 z-20"> -->
             <video id="video-feed" autoplay playsinline class="w-full h-full object-cover"></video>
             <img id="photo-preview" class="hidden w-full h-full object-cover" alt="Captured selfie">
             <div id="guide-overlay">

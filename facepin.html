@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lookify Face as PIN</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-white text-gray-900 flex items-center justify-center h-screen">
+  <div class="w-full max-w-md p-6">
+    <!-- Step 1: Enter Amount -->
+    <div id="step1" class="step">
+      <h2 class="text-xl font-semibold mb-6 text-center">Enter Amount</h2>
+      <div id="amountDisplay" class="text-2xl font-mono text-center mb-6">0</div>
+      <div class="grid grid-cols-3 gap-2 mb-6">
+        <button onclick="addDigit('1')" class="p-3 bg-gray-100 rounded">1</button>
+        <button onclick="addDigit('2')" class="p-3 bg-gray-100 rounded">2</button>
+        <button onclick="addDigit('3')" class="p-3 bg-gray-100 rounded">3</button>
+        <button onclick="addDigit('4')" class="p-3 bg-gray-100 rounded">4</button>
+        <button onclick="addDigit('5')" class="p-3 bg-gray-100 rounded">5</button>
+        <button onclick="addDigit('6')" class="p-3 bg-gray-100 rounded">6</button>
+        <button onclick="addDigit('7')" class="p-3 bg-gray-100 rounded">7</button>
+        <button onclick="addDigit('8')" class="p-3 bg-gray-100 rounded">8</button>
+        <button onclick="addDigit('9')" class="p-3 bg-gray-100 rounded">9</button>
+        <button onclick="addDigit('0')" class="p-3 bg-gray-100 rounded">0</button>
+        <button onclick="backspace()" class="p-3 bg-gray-100 rounded">←</button>
+      </div>
+      <button onclick="nextStep(2)" class="w-full py-3 bg-blue-600 text-white rounded-md">Next</button>
+    </div>
+
+    <!-- Step 2: Face Auth -->
+    <div id="step2" class="step hidden">
+      <img src="assets/images/logo.png" alt="Lookify Logo" class="w-16 mx-auto mb-4">
+      <div class="relative w-full aspect-[3/4] bg-gray-900 rounded-lg overflow-hidden mb-4">
+        <video id="video" autoplay playsinline class="w-full h-full object-cover"></video>
+        <div class="absolute inset-0 flex items-center justify-center p-8 pointer-events-none">
+          <div class="relative w-full h-2/3">
+            <div class="absolute top-0 left-0 w-12 h-12 border-t-4 border-l-4 border-white rounded-tl-lg"></div>
+            <div class="absolute top-0 right-0 w-12 h-12 border-t-4 border-r-4 border-white rounded-tr-lg"></div>
+            <div class="absolute bottom-0 left-0 w-12 h-12 border-b-4 border-l-4 border-white rounded-bl-lg"></div>
+            <div class="absolute bottom-0 right-0 w-12 h-12 border-b-4 border-r-4 border-white rounded-br-lg"></div>
+          </div>
+        </div>
+        <div id="liveness-overlay" class="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center text-white p-4">
+          <p id="timer-display" class="text-2xl font-bold mb-4">Time left: 8s</p>
+          <div id="liveness-visual-guide" class="w-48 h-64 border-4 border-dashed border-white rounded-full mb-4 flex items-center justify-center">
+            <div id="liveness-arrow-container"></div>
+          </div>
+          <p id="instruction-text" class="text-xl font-semibold text-center">Instruction</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: Success -->
+    <div id="step3" class="step hidden">
+      <div class="flex flex-col items-center">
+        <svg class="w-24 h-24 text-green-600 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+        <p class="text-lg text-center">Your Face-PIN was verified!</p>
+        <p class="text-center mt-2">Amount charged: <span id="charged-amount"></span></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const instructions = {
+      SMILE: { text: "Smile for the camera", visual: `<svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>` },
+      LOOK_LEFT: { text: "Look to the left", visual: `<svg class="w-16 h-16 animate-move-left" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>` }
+    };
+    let amount = '';
+    let stream;
+
+    function addDigit(d) {
+      amount += d;
+      document.getElementById('amountDisplay').innerText = amount ? new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR'}).format(amount) : '0';
+    }
+    function backspace() {
+      amount = amount.slice(0,-1);
+      document.getElementById('amountDisplay').innerText = amount ? new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR'}).format(amount) : '0';
+    }
+    function nextStep(step) {
+      document.querySelectorAll('.step').forEach(el => el.classList.add('hidden'));
+      document.getElementById('step'+step).classList.remove('hidden');
+      if (step === 2) {
+        startCamera(); startLiveness();
+      }
+      if (step === 3) {
+        document.getElementById('charged-amount').innerText = new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR'}).format(amount);
+      }
+    }
+    async function startCamera() {
+      if (stream) stream.getTracks().forEach(t => t.stop());
+      stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:'user' } });
+      document.getElementById('video').srcObject = stream;
+    }
+    function startLiveness() {
+      const keys = Object.keys(instructions);
+      const key = keys[Math.floor(Math.random()*keys.length)];
+      const ins = instructions[key];
+      document.getElementById('instruction-text').innerText = ins.text;
+      document.getElementById('liveness-arrow-container').innerHTML = ins.visual;
+      let t = 8;
+      document.getElementById('timer-display').innerText = `Time left: ${t}s`;
+      const iv = setInterval(() => {
+        t--;
+        document.getElementById('timer-display').innerText = `Time left: ${t}s`;
+        if (t <= 0) {
+          clearInterval(iv);
+          if (stream) stream.getTracks().forEach(tr => tr.stop());
+          nextStep(3);
+        }
+      }, 1000);
+    }
+    // Init at step1
+    window.addEventListener('DOMContentLoaded', () => nextStep(1));
+  </script>
+</body>
+</html>

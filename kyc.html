@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Identity Verification</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles to apply the Inter font */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom background color to match the image */
+        .bg-custom-blue {
+            background-color: #4A6C88;
+        }
+        /* Custom button color */
+        .bg-custom-dark-blue {
+            background-color: #3B5971;
+        }
+        .bg-custom-dark-blue:hover {
+            background-color: #314a5e;
+        }
+        /* Custom list background color */
+        .bg-custom-list-blue {
+             background-color: #3B5971;
+        }
+    </style>
+</head>
+<body class="bg-custom-blue text-white min-h-screen flex items-center justify-center p-4">
+
+    <div class="w-full max-w-sm mx-auto flex flex-col items-center text-center">
+
+        <div class="mb-6 flex flex-col items-center">
+            <img src="assets/images/logo.png" alt="Lookify Logo">
+            <!-- <h1 class="text-2xl font-bold mt-2">Lookify</h1> -->
+        </div>
+
+        <div class="mb-8">
+            <h2 class="text-3xl font-semibold leading-tight">Lets Verify your Identity</h2>
+            <p class="mt-4 text-gray-200 text-base max-w-xs">
+                To protect your account and comply with regulations, we need to verify your identity.
+            </p>
+        </div>
+
+        <div class="flex justify-center items-center space-x-4 mb-8">
+            <img src="assets/images/ktp.png" 
+                 alt="ID Card Illustration" 
+                 class="rounded-lg shadow-lg w-[120px] h-[80px]"
+                 onerror="this.onerror=null;this.src='https://placehold.co/120x80/6E8DA4/FFFFFF?text=ID+Card';">
+            <img src="assets/images/person.png" 
+                 alt="Face Photo Illustration" 
+                 class="rounded-lg shadow-lg w-[80px] h-[100px]"
+                 onerror="this.onerror=null;this.src='https://placehold.co/80x100/E0E0E0/333333?text=Person';">
+        </div>
+
+        <div class="bg-custom-list-blue p-6 rounded-lg w-full max-w-xs mb-10 text-left">
+            <ol class="list-decimal list-inside space-y-3 text-gray-100">
+                <li>Face photo</li>
+                <li>ID photo</li>
+                <li>Selfie with ID</li>
+                <li>Video gesture verification</li>
+            </ol>
+        </div>
+
+        <div class="w-full max-w-xs">
+            <a href="selfie.html" class="block bg-custom-dark-blue text-white font-bold py-4 px-4 rounded-full w-full shadow-lg transition-transform transform hover:scale-105 text-center">
+                Continue
+            </a>
+        </div>
+
+    </div>
+
+</body>
+</html>
